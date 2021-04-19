@@ -16,40 +16,32 @@ ip_address_of_pc = socket. gethostbyname(hostname + ".local")
 
 
 def get_video(url):
-    try:
-        print(url)
-        cap = cv2.VideoCapture(url)
-        success, frame = cap.read()
-        hour, minutes = datetime.datetime.now().hour, datetime.datetime.now().minute
-        outname = cameras_info[url][1] + '+' + cameras_info[url][0] + '+' + str(datetime.date.today()) + '+' \
-                  + str(hour) + '.' + str(minutes) + image_format
-        # print(outname)
-        if success:
+    # To write the results in excel sheet
+    with open(os.path.join(new_folder_name, 'StatusOf_ip{}_hostname{}_{}.csv'
+            .format(ip_address_of_pc, hostname, datetime.datetime.now().strftime("%h-%d-%Y"))), 'at') as erf:
+        try:
+            print(url)
+            cap = cv2.VideoCapture(url)
+            success, frame = cap.read()
+            hour, minutes = datetime.datetime.now().hour, datetime.datetime.now().minute
+            outname = cameras_info[url][1] + '+' + cameras_info[url][0] + '+' + str(datetime.date.today()) + '+' \
+                      + str(hour) + '.' + str(minutes) + image_format
             print(outname)
-            print('success')
-            with open(os.path.join(new_folder_name, 'StatusOf_ip{}_hostname{}_{}.csv'
-                    .format(ip_address_of_pc, hostname, datetime.datetime.now().strftime("%h-%d-%Y"))), 'at') as erf:
+            if success:
+                print('success')
                 erf.write(cameras_info[url][1] + ',' + cameras_info[url][0] + ',' + url + ',' + str(
                     datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")) + ',' + 'working' + '\n')
-            cv2.imwrite(os.path.join(new_folder_name, outname), frame)
-            cap.release()
-        else:
-            print(outname)
-            print('not success')
-            with open(os.path.join(new_folder_name, 'StatusOf_ip{}_hostname{}_{}.csv'
-                    .format(ip_address_of_pc, hostname, datetime.datetime.now().strftime("%h-%d-%Y"))), 'at') as erf:
+                cv2.imwrite(os.path.join(new_folder_name, outname), frame)
+            else:
+                print('not success')
                 erf.write(cameras_info[url][1] + ',' + cameras_info[url][0] + ',' + url + ',' + str(
                     datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")) + ',' + 'not working' + '\n')
+            cap.release()
 
-
-    except cv2.error as e:
-        with open(os.path.join(new_folder_name, 'StatusOf_ip{}_hostname{}_{}.csv'
-                .format(ip_address_of_pc, hostname, datetime.datetime.now().strftime("%h-%d-%Y"))), 'at') as erf:
+        except cv2.error as e:
             erf.write(cameras_info[url][1] + ',' + cameras_info[url][0] + ',' + url + ',' + str(
                 datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")) + ',' + str(e) + '\n')
-    except Exception as e:
-        with open(os.path.join(new_folder_name, 'StatusOf_ip{}_hostname{}_{}.csv'
-                .format(ip_address_of_pc, hostname, datetime.datetime.now().strftime("%h-%d-%Y"))), 'at') as erf:
+        except Exception as e:
             erf.write(cameras_info[url][1] + ',' + cameras_info[url][0] + ',' + url + ',' + str(
                 datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")) + ',' + str(e) + '\n')
 
